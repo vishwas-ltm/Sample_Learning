@@ -27,8 +27,9 @@
                 }
               },
               "queryRef": "Dim_Location.State",
-              "nativeQueryRef": "State",
-              "active": true
+              "nativeQueryRef": "Select State",
+              "active": true,
+              "displayName": "Select State"
             }
           ]
         }
