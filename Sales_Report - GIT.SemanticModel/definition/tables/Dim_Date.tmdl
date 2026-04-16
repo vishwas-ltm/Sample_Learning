@@ -1,0 +1,94 @@
+table Dim_Date
+	lineageTag: 3c62f83c-06e6-4dac-9da6-1e4c80609dcc
+
+	column Key
+		dataType: int64
+		formatString: 0
+		lineageTag: ed2699e0-4c38-4363-b3f4-2543e2cb1257
+		summarizeBy: none
+		sourceColumn: Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date_Key
+		dataType: int64
+		formatString: 0
+		lineageTag: 996b1b7f-a53a-4cc4-b93d-8285bdf8f019
+		summarizeBy: none
+		sourceColumn: Date_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6a7adb57-b0aa-4f90-9ba8-86402fb54342
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Quarter
+		dataType: string
+		lineageTag: 980d697f-e117-4fda-9f61-751129bdac74
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: int64
+		formatString: 0
+		lineageTag: cf93d4c7-b27e-45e9-8456-394a97fa6b47
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month_Nam
+		dataType: string
+		lineageTag: 233d7ac4-5933-41d6-8278-e5ce43f87143
+		summarizeBy: none
+		sourceColumn: Month_Nam
+		sortByColumn: Month
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 3acecd49-2ee7-4ee6-8725-dd1f83025f0d
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Date = m
+		mode: import
+		source = ```
+				let
+				    Query1 = let
+				    Source = Excel.Workbook(File.Contents("C:/Users/10741438/OneDrive - LTIMindtree/Desktop/LookerMetadata_Json/Sample_Sales_Data.xlsx"), null, true),
+				    
+				    // Base Table extraction logic
+				    Fact_Sales = Source{[Item="Fact_Sales",Kind="Sheet"]}[Data],
+				    Dim_Date = Source{[Item="Dim_Date",Kind="Sheet"]}[Data],
+				    Dim_Product = Source{[Item="Dim_Product",Kind="Sheet"]}[Data],
+				    Dim_Location = Source{[Item="Dim_Location",Kind="Sheet"]}[Data],
+				    Dim_Customer = Source{[Item="Dim_Customer",Kind="Sheet"]}[Data]
+				in
+				    Dim_Date,
+				    #"Promoted Headers" = Table.PromoteHeaders(Query1, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Key", Int64.Type}, {"Date_Key", Int64.Type}, {"Date", type date}, {"Quarter", type text}, {"Month", Int64.Type}, {"Month_Nam", type text}, {"Year", Int64.Type}})
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

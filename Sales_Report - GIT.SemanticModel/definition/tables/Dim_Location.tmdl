@@ -1,0 +1,61 @@
+table Dim_Location
+	lineageTag: 75c7859c-dace-4290-810f-450dce92201e
+
+	column Location_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 429dd607-b024-472f-9358-b2a86fa7d5cf
+		summarizeBy: none
+		sourceColumn: Location_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: bfe102b4-3bea-416d-84be-4fa801d1ffb2
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column State
+		dataType: string
+		lineageTag: 27de10b2-d92e-4488-ba9b-3472869758a5
+		summarizeBy: none
+		sourceColumn: State
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 44f2f168-3b4d-496c-ba2b-d5159aa5a1ea
+		summarizeBy: none
+		sourceColumn: Country
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Location = m
+		mode: import
+		source = ```
+				let
+				    Dim_Location = let
+				    Source = Excel.Workbook(File.Contents("C:/Users/10741438/OneDrive - LTIMindtree/Desktop/LookerMetadata_Json/Sample_Sales_Data.xlsx"), null, true),
+				    
+				    // Base Table extraction logic
+				    Fact_Sales = Source{[Item="Fact_Sales",Kind="Sheet"]}[Data],
+				    Dim_Date = Source{[Item="Dim_Date",Kind="Sheet"]}[Data],
+				    Dim_Product = Source{[Item="Dim_Product",Kind="Sheet"]}[Data],
+				    Dim_Location = Source{[Item="Dim_Location",Kind="Sheet"]}[Data],
+				    Dim_Customer = Source{[Item="Dim_Customer",Kind="Sheet"]}[Data]
+				in
+				    Dim_Location,
+				    #"Promoted Headers" = Table.PromoteHeaders(Dim_Location, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Location_ID", Int64.Type}, {"City", type text}, {"State", type text}, {"Country", type text}})
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

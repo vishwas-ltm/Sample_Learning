@@ -1,0 +1,84 @@
+table Fact_Sales
+	lineageTag: 1e7c02f1-19dc-4df6-bebb-147a24849bc4
+
+	column Product_ID
+		dataType: int64
+		formatString: #,0
+		lineageTag: 087ecab7-cc24-43d8-8138-2d8aeab2c5eb
+		summarizeBy: none
+		sourceColumn: Product_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Location_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 94f42792-45da-4d41-8484-742ace2d6b45
+		summarizeBy: none
+		sourceColumn: Location_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_ID
+		dataType: int64
+		formatString: #,0
+		lineageTag: 4c706b8c-9ba8-42b2-aa0b-ef43d3aed827
+		summarizeBy: none
+		sourceColumn: Customer_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sale_Date
+		dataType: int64
+		formatString: 0
+		lineageTag: 16328285-b544-4cff-a23f-2684e06620e2
+		summarizeBy: none
+		sourceColumn: Sale_Date
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 28c2f32c-e492-4438-a1c8-18cc09439b6e
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sales_Amt
+		dataType: int64
+		formatString: "₹"\ #,0;#,0\ -"₹";"₹"\ #,0
+		lineageTag: 4359781c-98f0-4ca5-a9ae-1d76ed3caa18
+		summarizeBy: sum
+		sourceColumn: Sales_Amt
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-IN"}
+
+	partition Fact_Sales = m
+		mode: import
+		source = ```
+				let
+				    Fact_Sales = let
+				    Source = Excel.Workbook(File.Contents("C:/Users/10741438/OneDrive - LTIMindtree/Desktop/LookerMetadata_Json/Sample_Sales_Data.xlsx"), null, true),
+				    
+				    // Base Table extraction logic
+				    Fact_Sales = Source{[Item="Fact_Sales",Kind="Sheet"]}[Data],
+				    Dim_Date = Source{[Item="Dim_Date",Kind="Sheet"]}[Data],
+				    Dim_Product = Source{[Item="Dim_Product",Kind="Sheet"]}[Data],
+				    Dim_Location = Source{[Item="Dim_Location",Kind="Sheet"]}[Data],
+				    Dim_Customer = Source{[Item="Dim_Customer",Kind="Sheet"]}[Data]
+				in
+				    Fact_Sales,
+				    #"Promoted Headers" = Table.PromoteHeaders(Fact_Sales, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Product_ID", Int64.Type}, {"Location_ID", Int64.Type}, {"Customer_ID", Int64.Type}, {"Sale_Date", Int64.Type}, {"Quantity", Int64.Type}, {"Sales_Amt", Int64.Type}})
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

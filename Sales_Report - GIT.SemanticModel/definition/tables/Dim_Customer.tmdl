@@ -1,0 +1,59 @@
+table Dim_Customer
+	lineageTag: e6e6029f-8591-45f8-b1ac-abd065c301c3
+
+	column Customer_ID
+		dataType: int64
+		formatString: 0
+		lineageTag: 4ae5b8a0-11a8-4641-bae8-9159f529ace4
+		summarizeBy: none
+		sourceColumn: Customer_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Customer_Name
+		dataType: string
+		lineageTag: 50169d77-ab3e-4448-9d79-e4959e90c184
+		summarizeBy: none
+		sourceColumn: Customer_Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Telephone
+		dataType: int64
+		formatString: 0
+		lineageTag: 6711d438-e760-4d53-b368-a20c2d7a1b17
+		summarizeBy: none
+		sourceColumn: Telephone
+
+		annotation SummarizationSetBy = Automatic
+
+	column Email
+		dataType: string
+		lineageTag: b7bd3d78-0b36-4b0f-b279-320dd5f7e305
+		summarizeBy: none
+		sourceColumn: Email
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Customer = m
+		mode: import
+		source = ```
+				let
+				    Source = Excel.Workbook(File.Contents("C:/Users/10741438/OneDrive - LTIMindtree/Desktop/LookerMetadata_Json/Sample_Sales_Data.xlsx"), null, true),
+				    
+				    // Base Table extraction logic
+				    Fact_Sales = Source{[Item="Fact_Sales",Kind="Sheet"]}[Data],
+				    Dim_Date = Source{[Item="Dim_Date",Kind="Sheet"]}[Data],
+				    Dim_Product = Source{[Item="Dim_Product",Kind="Sheet"]}[Data],
+				    Dim_Location = Source{[Item="Dim_Location",Kind="Sheet"]}[Data],
+				    Dim_Customer = Source{[Item="Dim_Customer",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Dim_Customer, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Customer_ID", Int64.Type}, {"Customer_Name", type text}, {"Telephone", Int64.Type}, {"Email", type text}})
+				in
+				    #"Changed Type"
+				```
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
