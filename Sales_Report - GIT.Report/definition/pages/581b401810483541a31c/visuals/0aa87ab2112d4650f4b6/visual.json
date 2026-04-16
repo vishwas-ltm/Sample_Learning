@@ -27,8 +27,9 @@
                 }
               },
               "queryRef": "Dim_Date.Year",
-              "nativeQueryRef": "Year",
-              "active": true
+              "nativeQueryRef": "Select Year",
+              "active": true,
+              "displayName": "Select Year"
             }
           ]
         }
